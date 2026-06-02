@@ -1,0 +1,5 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0
+WORKDIR /app/Presentation
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
+# We don't COPY the code here because the Volume Mount will provide it
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "Presentation.csproj", "--no-launch-profile", "--no-hot-reload"]

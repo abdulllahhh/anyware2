@@ -1,0 +1,8 @@
+**/.dockerignore
+**/.git
+**/.vs
+**/bin
+**/obj
+**/*.user
+**/*.lock.json
+.DS_Store

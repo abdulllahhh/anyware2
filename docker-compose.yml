@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=TemplateDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: Presentation/Dockerfile.dev
+    depends_on:
+      - db
+      - redis
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS:-http://+:8080}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password:-123456789}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path:-/https/aspnetapp.pfx}
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+      - Redis__ConnectionString=${Redis__ConnectionString}
+      - Redis__Host=${Redis__Host}
+      - Redis__Port=${Redis__Port}
+      - Redis__UserName=${Redis__UserName}
+      - Redis__Password=${Redis__Password}
+      - JWT__Key=${JWT__Key}
+      - JWT__Issuer=${JWT__Issuer}
+      - JWT__Audience=${JWT__Audience}
+      - JWT__ExpirationMinutes=${JWT__ExpirationMinutes}
+    volumes:
+      - .:/app
+      - /app/Presentation/bin
+      - /app/Presentation/obj
+      - /app/Infrastructure/bin
+      - /app/Infrastructure/obj
+      - /app/Domain/bin
+      - /app/Domain/obj
+      - /app/Application/bin
+      - /app/Application/obj
+      - ${HOST_CERT_PATH:-C:\Users\babda\AppData\Roaming\ASP.NET\https}:/https:ro
+    working_dir: /app/Presentation
+    ports:
+      - "${PORT_HTTP:-8080}:8080"
+      - "${PORT_HTTPS:-8081}:8081"
+
+volumes:
+  postgres_data:
