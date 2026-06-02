@@ -14,110 +14,129 @@ using Presentation.Middleware;
 using StackExchange.Redis;
 using System.Text;
 
-namespace Presentation
+namespace Presentation;
+
+public class Program
 {
-    public class Program
+    public static async Task Main(string[] args)
     {
-        public static async Task Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 
+        // Controllers
+        builder.Services.AddControllers();
 
-            // Services Registration
-            builder.Services.AddControllers();
+        // Database
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(
+                builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Database
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        // Redis
+        var redisConnectionString =
+            (builder.Configuration["Redis:ConnectionString"] ?? "localhost:6379")
+            + ",abortConnect=false";
 
-            // Redis
-            var redisConnString = (builder.Configuration["Redis:ConnectionString"] ?? "localhost:6379") + ",abortConnect=false";
-            builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnString));           
-            // Repositories
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+        builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+            ConnectionMultiplexer.Connect(redisConnectionString));
 
-            // Application Services
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<ITaskService, TaskService>();
-            builder.Services.AddScoped<ICacheService, RedisCacheService>();
+        // Repositories
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 
-            // Security
-            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-            builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+        // Application Services
+        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<ITaskService, TaskService>();
 
-            // Background Service Queue
-            builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-            builder.Services.AddHostedService<TaskProcessingBackgroundService>();
+        // Infrastructure Services
+        builder.Services.AddScoped<ICacheService, RedisCacheService>();
+        builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+        builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
-            // JWT Authentication
-            var jwtKey = builder.Configuration.GetRequiredSection("JWT")["Key"];
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration["JWT:Issuer"],
-                        ValidAudience = builder.Configuration["JWT:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!))
-                    };
-                });
+        // Background Processing
+        builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        builder.Services.AddHostedService<TaskProcessingBackgroundService>();
 
-            builder.Services.AddAuthorization();
-
-            // Swagger
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c =>
+        // JWT Authentication
+        builder.Services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Task Management API", Version = "v1" });
-
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer",
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
 
-                });
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
 
-
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(
+                            builder.Configuration["JWT:Key"]!))
+                };
             });
 
-            var app = builder.Build();
+        builder.Services.AddAuthorization();
 
-            // Setup Middleware
-            app.UseMiddleware<GlobalExceptionMiddleware>();
+        // Swagger
+        builder.Services.AddEndpointsApiExplorer();
 
-            // Always enable Swagger for testing
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Task Management API v1"));
-
-            // Enable CORS for local testing/Swagger
-            app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-
-            if (app.Environment.IsDevelopment())
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
             {
-                app.UseDeveloperExceptionPage();
-            }
-            else
+                Title = "Task Management API",
+                Version = "v1"
+            });
+
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                app.UseHttpsRedirection();
-            }
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Description = "Enter JWT Bearer token"
+            });
 
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.MapControllers();
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
-            // Seed Database
-            await DatabaseSeeder.SeedAsync(app.Services);
+        var app = builder.Build();
 
-            await app.RunAsync();
+        // Middleware
+        app.UseMiddleware<GlobalExceptionMiddleware>();
+
+        app.UseSwagger();
+        app.UseSwaggerUI();
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+        // Database Seed
+        using (var scope = app.Services.CreateScope())
+        {
+            await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
         }
+
+        await app.RunAsync();
     }
 }
