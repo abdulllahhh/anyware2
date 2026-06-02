@@ -1,8 +1,6 @@
+using Application.Exceptions;
 using System.Net;
 using System.Text.Json;
-using Application.Exceptions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 namespace Presentation.Middleware
 {
     public class GlobalExceptionMiddleware

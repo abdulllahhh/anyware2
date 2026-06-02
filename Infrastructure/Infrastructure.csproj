@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Messaging\" />
-    <Folder Include="SignalR\" />
-    <Folder Include="Services\" />
-    <Folder Include="Resilience\" />
+    <Compile Remove="Resilience\**" />
+    <Compile Remove="SignalR\**" />
+    <EmbeddedResource Remove="Resilience\**" />
+    <EmbeddedResource Remove="SignalR\**" />
+    <None Remove="Resilience\**" />
+    <None Remove="SignalR\**" />
   </ItemGroup>
 
   <ItemGroup>

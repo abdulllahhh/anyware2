@@ -24,5 +24,11 @@ namespace Presentation.Controllers
             var response = await _authService.LoginAsync(request);
             return Ok(response);
         }
+        [HttpGet("GetMyInfo")]
+        public async Task<IActionResult> GetUser()
+        {
+            var user = _authService.GetCurrentUser();
+            return Ok(user);
+        }
     }
 }
