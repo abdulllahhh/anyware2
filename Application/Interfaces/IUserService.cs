@@ -7,7 +7,6 @@ namespace Application.Interfaces
         Task<IEnumerable<UserDto>> GetAllUsersAsync();
         Task<PagedResult<UserDto>> GetUsersAsync(PaginationRequest request);
         Task DeleteUserAsync(Guid id);
-        Task SoftDeleteUserAsync(Guid id);
         Task<UserDto?> GetUserByIdAsync(Guid id);
         Task<UserDto> CreateUserAsync(CreateUserRequest request);
 
