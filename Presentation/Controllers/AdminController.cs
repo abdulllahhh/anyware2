@@ -48,5 +48,11 @@ namespace Presentation.Controllers
             return Ok(user);
 
         }
+        [HttpDelete("users/SoftDelete/{id}")]
+        public async Task<IActionResult> SoftDeleteUser(Guid id)
+        {
+            await _userService.SoftDeleteUserAsync(id);
+            return NoContent();
+        }
     }
 }

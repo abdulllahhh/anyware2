@@ -90,5 +90,21 @@ namespace Infrastructure.Services
                 CreatedAt = user.CreatedAt
             };
         }
+
+        public async Task SoftDeleteUserAsync(Guid id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+
+            if (user == null)
+                throw new Exception("User not found");
+            if (user.Role == Domain.Enums.UserRole.Admin)
+            {
+                throw new AppException("Cannot delete the admin user.");
+            }
+            user.SoftDelete();
+
+            await _userRepository.Update(user);
+            await _userRepository.SaveChangesAsync();
+        }
     }
 }

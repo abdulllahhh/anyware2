@@ -10,6 +10,7 @@ namespace Application.Interfaces.Repository
         Task<PagedResult<User>> GetPagedAsync(PaginationRequest request);
         Task<bool> ExistsByEmailAsync(string email);
         Task AddAsync(User user);
+        Task Update(User user);
         Task DeleteAsync(Guid id);
         Task SaveChangesAsync();
     }

@@ -9,10 +9,17 @@ namespace Domain.Entities
         public string PasswordHash { get; private set; }
         public UserRole Role { get; private set; }
         public DateTime CreatedAt { get; private set; }
+        public bool IsDeleted { get; private set; }
 
 
         private User() { }
+        public void SoftDelete()
+        {
+            if (Role == UserRole.Admin)
+                throw new InvalidOperationException("Admin users cannot be deleted.");
 
+            IsDeleted = true;
+        }
         public static User Create(
         string email,
         string Name,

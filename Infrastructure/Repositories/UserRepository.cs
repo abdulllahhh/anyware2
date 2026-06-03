@@ -98,5 +98,10 @@ namespace Infrastructure.Repositories
         {
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
+
+        public async Task Update(User user)
+        {
+            _context.Users.Update(user);
+        }
     }
 }
