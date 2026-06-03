@@ -2,7 +2,6 @@ using Infrastructure.Data;
 using Infrastructure.DependencyInjection;
 using Presentation.DependencyInjection;
 using Presentation.Middleware;
-using System.Text.Json.Serialization;
 
 namespace Presentation;
 
@@ -13,11 +12,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Controllers
-        builder.Services.AddControllers().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.Converters.Add(
-                new JsonStringEnumConverter());
-        });
+        builder.Services.AddControllers();
 
         builder.Services.AddPresentation(builder.Configuration);
 

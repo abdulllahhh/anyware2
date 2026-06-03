@@ -2,7 +2,6 @@ using Application.DTOs.RequestDtos;
 using Application.DTOs.User;
 using Application.Exceptions;
 using Application.Interfaces;
-using Application.Interfaces.Query;
 using Application.Interfaces.Repository;
 using Domain.Entities;
 
@@ -11,12 +10,9 @@ namespace Infrastructure.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IUserQueryService _userQueryService;
-
-        public UserService(IUserRepository userRepository, IUserQueryService userQueryService)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _userQueryService = userQueryService;
         }
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
         {
@@ -71,11 +67,17 @@ namespace Infrastructure.Services
 
             return MapToDto(user);
         }
-        public async Task<UsersPagedResult> GetUsersAsync(PaginationRequest request)
+        public async Task<PagedResult<UserDto>> GetUsersAsync(PaginationRequest request)
         {
-            var result = await _userQueryService.GetPagedAsync(request);
+            var result = await _userRepository.GetPagedAsync(request);
 
-            return result;
+            return new PagedResult<UserDto>
+            {
+                Items = result.Items.Select(MapToDto).ToList(),
+                TotalCount = result.TotalCount,
+                Page = result.Page,
+                PageSize = result.PageSize
+            };
         }
         private UserDto MapToDto(User user)
         {

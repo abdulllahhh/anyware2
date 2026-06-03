@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using Application.Interfaces.Query;
 using Application.Interfaces.Repository;
 using Infrastructure.Background;
 using Infrastructure.Data;
@@ -28,8 +27,6 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITaskService, TaskService>();
-
-            services.AddScoped<IUserQueryService, UserQueryService>();
 
 
             services.AddScoped<IUserRepository, UserRepository>();

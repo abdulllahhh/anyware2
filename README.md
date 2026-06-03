@@ -25,7 +25,6 @@ This is a clean, DDD-structured Task Management Backend API built with .NET 8.
 - **Swagger Documentation**
 - **Database Seeding**
 - **Global Exception Handling**
-- **Soft Delete** : Admin can Soft delete Users.
 
 ## Requirements
 

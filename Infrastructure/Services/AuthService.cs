@@ -44,8 +44,6 @@ namespace Infrastructure.Services
             {
                 throw new AppException("Invalid email or password.");
             }
-            if (user.IsDeleted)
-                throw new AppException("Account is disabled.");
             var token = _jwtProvider.GenerateToken(user);
             return new AuthResponse { Token = token, Message = "Login successful" };
         }
