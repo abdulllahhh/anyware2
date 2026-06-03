@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using Application.DTOs.User;
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace Application.DTOs.RequestDtos
     {
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
-        public string? SortBy { get; set; }
+
+        public UserSortBy? SortBy { get; set; }
         public bool SortDescending { get; set; }
         public UserFilter? Filter { get; set; }
     }
@@ -27,5 +29,10 @@ namespace Application.DTOs.RequestDtos
         public int Page { get; set; }
         public int PageSize { get; set; }
         public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+    }
+    public class UsersPagedResult
+    {
+        public PagedResult<AdminUserDto> ActiveUsers { get; set; }
+        public PagedResult<AdminUserDto> DeletedUsers { get; set; }
     }
 }

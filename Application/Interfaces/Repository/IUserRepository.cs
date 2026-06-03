@@ -7,7 +7,6 @@ namespace Application.Interfaces.Repository
         Task<User?> GetByIdAsync(Guid id);
         Task<User?> GetByEmailAsync(string email);
         Task<IEnumerable<User>> GetAllAsync();
-        Task<PagedResult<User>> GetPagedAsync(PaginationRequest request);
         Task<bool> ExistsByEmailAsync(string email);
         Task AddAsync(User user);
         Task Update(User user);
