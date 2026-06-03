@@ -23,14 +23,12 @@ namespace Infrastructure.Data
                 if (!await context.Users.AnyAsync(u => u.Email == "admin@example.com"))
                 {
                     logger.LogInformation("Seeding default admin user.");
-                    var adminUser = new User
-                    {
-                        Name = "Admin User",
-                        Email = "admin@example.com",
-                        PasswordHash = passwordHasher.HashPassword("Admin@123"),
-                        Role = UserRole.Admin,
-                        CreatedAt = DateTime.UtcNow
-                    };
+                    var adminUser = User.Create(
+                       "admin@example.com",
+                        "Admin User",
+                        UserRole.Admin,
+                        "Admin@123"
+                    );
                     await context.Users.AddAsync(adminUser);
                     await context.SaveChangesAsync();
                 }

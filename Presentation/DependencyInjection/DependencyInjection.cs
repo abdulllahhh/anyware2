@@ -11,6 +11,7 @@ namespace Presentation.DependencyInjection
     {
         public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUser, CurrentUser>();
 
             services

@@ -1,4 +1,3 @@
-using Application.DependencyInjection;
 using Infrastructure.Data;
 using Infrastructure.DependencyInjection;
 using Presentation.DependencyInjection;
@@ -19,7 +18,6 @@ public class Program
 
         builder.Services.AddInfrastructure(builder.Configuration);
 
-        builder.Services.AddApplication();
 
         builder.Services.AddAuthorization();
 

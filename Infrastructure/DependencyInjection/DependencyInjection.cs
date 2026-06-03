@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Domain.Interfaces;
+using Application.Interfaces.Repository;
 using Infrastructure.Background;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
@@ -22,6 +22,12 @@ namespace Infrastructure.DependencyInjection
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(
                     configuration.GetConnectionString("DefaultConnection")));
+
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITaskService, TaskService>();
+
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();

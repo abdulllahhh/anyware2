@@ -1,9 +1,10 @@
 using Application.DTOs.Auth;
 using Application.Exceptions;
 using Application.Interfaces;
+using Application.Interfaces.Repository;
 using Domain.Entities;
-using Domain.Interfaces;
-namespace Application.Services
+using Domain.Enums;
+namespace Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
@@ -25,13 +26,12 @@ namespace Application.Services
             {
                 throw new AppException("Email already in use.");
             }
-            var user = new User
-            {
-                Name = request.Name,
-                Email = request.Email,
-                PasswordHash = _passwordHasher.HashPassword(request.Password),
-                Role = Domain.Enums.UserRole.User
-            };
+            var user = User.Create(
+                request.Email,
+                request.Name,
+               UserRole.User,
+                request.Password
+            );
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
             var token = _jwtProvider.GenerateToken(user);
@@ -50,10 +50,11 @@ namespace Application.Services
         public async Task<UserResponse> GetCurrentUser()
         {
             var userId = _currentUser.UserId;
+
             var user = await _userRepository.GetByIdAsync(userId);
             return new UserResponse
             {
-                CreatedAt = user.CreatedAt,
+                CreatedAt = user!.CreatedAt,
                 Email = user.Email,
                 Id = userId,
                 Name = user.Name,

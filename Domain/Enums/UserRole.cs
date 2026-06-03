@@ -2,7 +2,7 @@ namespace Domain.Enums
 {
     public enum UserRole
     {
-        User,
-        Admin
+        User = 1,
+        Admin = 2
     }
 }

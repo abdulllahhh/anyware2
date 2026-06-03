@@ -1,9 +1,9 @@
 using Application.DTOs.Task;
 using Application.Exceptions;
 using Application.Interfaces;
+using Application.Interfaces.Repository;
 using Domain.Entities;
-using Domain.Interfaces;
-namespace Application.Services
+namespace Infrastructure.Services
 {
     public class TaskService : ITaskService
     {
@@ -43,7 +43,7 @@ namespace Application.Services
         {
             string cacheKey = $"task_{id}";
             var cachedTask = await _cacheService.GetAsync<TaskDto>(cacheKey);
-            
+
             if (cachedTask != null)
             {
                 // Verify ownership of the cached task
@@ -65,7 +65,7 @@ namespace Application.Services
         public async Task<IEnumerable<TaskDto>> GetAllTasksForUserAsync(Guid userId)
         {
             var tasks = await _taskRepository.GetAllForUserAsync(userId);
-            
+
             // Business Logic Requirement: Sort tasks by priority first, then by creation date
             var sortedTasks = tasks
                 .OrderByDescending(t => t.Priority)

@@ -1,8 +1,8 @@
-using System.Security.Claims;
 using Application.DTOs.Task;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 namespace Presentation.Controllers
 {
     [ApiController]
@@ -11,18 +11,15 @@ namespace Presentation.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
-        public TasksController(ITaskService taskService)
+        private readonly ICurrentUser _currentUser;
+        public TasksController(ITaskService taskService, ICurrentUser currentUser)
         {
             _taskService = taskService;
+            _currentUser = currentUser;
         }
         private Guid GetUserId()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (Guid.TryParse(userIdClaim, out var userId))
-            {
-                return userId;
-            }
-            throw new UnauthorizedAccessException("Invalid token claims.");
+            return _currentUser.UserId;
         }
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskRequest request)

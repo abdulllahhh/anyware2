@@ -27,7 +27,7 @@ namespace Presentation.Controllers
         [HttpGet("GetMyInfo")]
         public async Task<IActionResult> GetUser()
         {
-            var user = _authService.GetCurrentUser();
+            var user = await _authService.GetCurrentUser();
             return Ok(user);
         }
     }

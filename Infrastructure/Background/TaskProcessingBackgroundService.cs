@@ -1,6 +1,6 @@
 using Application.Interfaces;
+using Application.Interfaces.Repository;
 using Domain.Entities;
-using Domain.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
