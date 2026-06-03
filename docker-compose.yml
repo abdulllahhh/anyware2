@@ -25,8 +25,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - ASPNETCORE_URLS=${ASPNETCORE_URLS:-http://+:8080}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password:-123456789}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path:-/https/aspnetapp.pfx}
       - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
       - Redis__ConnectionString=${Redis__ConnectionString}
       - Redis__Host=${Redis__Host}
@@ -47,11 +45,9 @@ services:
       - /app/Domain/obj
       - /app/Application/bin
       - /app/Application/obj
-      - ${HOST_CERT_PATH:-C:\Users\babda\AppData\Roaming\ASP.NET\https}:/https:ro
     working_dir: /app/Presentation
     ports:
       - "${PORT_HTTP:-8080}:8080"
-      - "${PORT_HTTPS:-8081}:8081"
 
 volumes:
   postgres_data:

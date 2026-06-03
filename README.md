@@ -13,10 +13,40 @@ This is a clean, DDD-structured Task Management Backend API built with .NET 8.
 - **Database Seeding**: Default Admin user seeded on startup.
 - **Swagger Documentation**: Interactive API documentation.
 
+## Features List
+
+- **JWT Authentication & Authorization**
+- **User Registration and Login**
+- **Admin User Management**
+- **Task Management**
+- **Redis Caching**
+- **Background Processing using .NET BackgroundService**
+- **PostgreSQL Database**
+- **Swagger Documentation**
+- **Database Seeding**
+- **Global Exception Handling**
+
 ## Requirements
 
 - Docker and Docker Compose
 - .NET 8 SDK (for local development without Docker)
+
+## Running the Application
+
+1. **Clone the Repository**
+
+- git clone <repository-url>
+- cd <repository-folder>
+
+2. **Create Environment File**
+
+- Create a .env file in the root directory.
+
+- You can copy the provided example:
+
+- cp .env.example .env
+
+- Windows PowerShell: Copy-Item .env.example .env
 
 ## Setup and Run
 
@@ -48,3 +78,15 @@ The application will automatically seed a default admin user:
 2. **Caching**: Redis is configured to cache `GetTaskById` for 10 minutes.
 3. **Background Processing**: Used a native .NET `Channel<TaskItem>` as an in-memory queue to simulate sending tasks to a worker, instead of standing up an external broker like RabbitMQ.
 4. **User Entity**: Instead of using the full ASP.NET Core Identity system which brings in a lot of tables and complexity, a lightweight custom `User` entity was implemented alongside BCrypt for hashing, to keep the solution clean and focused.
+
+## Technologies
+
+- .NET 8
+- ASP.NET Core Web API
+- Entity Framework Core
+- PostgreSQL
+- Redis
+- JWT Authentication
+- Swagger / OpenAPI
+- Docker
+- BCrypt
